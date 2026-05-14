@@ -297,6 +297,7 @@
         endTime:        isoInTz(end,   BUSINESS_TZ),
         title:          `${name} — Medical Face and Neck Double Lifting Treatment`,
         selectedTimezone: BUSINESS_TZ,
+        appointmentStatus: 'new',
       });
 
       track("Lead", { content_name: SERVICE_NAME });
