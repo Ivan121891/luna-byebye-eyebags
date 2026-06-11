@@ -2,18 +2,20 @@
   "use strict";
 
   // ------- Configuration -------
-  const SERVICE_NAME = "Botox Glow Deal";
+  const SERVICE_NAME = "Korean Facial";
   const SERVICE_DURATION_MIN = 60;
 
   // GHL credentials
   const GHL = {
     locationId: '9fZSzFzTFV8sZzfj4SlV',
-    calendarId: 'ZlawzjZ3ecYnJKDM111A',
+    calendarId: 'MXYdHY62boEtbYg013ho',
     userId:     '2tQreqXcDpaAiSBqlK7T',
-    apiKey:     'pit-62015106-1b7f-4521-9713-96cc49366787',
+    apiKey:     'pit-cb0574e9-f84b-402f-a440-36aabe739ad1',
     apiBase:    'https://services.leadconnectorhq.com',
     version:    '2021-07-28',
   };
+
+  const DEDICATED_PIXEL_ID = '1541798407303624';
 
   const BUSINESS_TZ = "America/Los_Angeles";
 
@@ -121,8 +123,11 @@
 
     const cells = [];
     const cursor = new Date(today);
-    for (let i = 0; i < 6; i++) {
-      cells.push(new Date(cursor));
+    while (cells.length < 6) {
+      const dow = cursor.getDay();
+      if (dow !== 0 && dow !== 6) {
+        cells.push(new Date(cursor));
+      }
       cursor.setDate(cursor.getDate() + 1);
     }
 
@@ -220,9 +225,20 @@
 
   function track(event, params) {
     if (typeof window.fbq === "function") {
-      try { window.fbq("track", event, params || {}); } catch (_) {}
+      try { window.fbq("trackSingle", "1178133073434960", event, params || {}); } catch (_) {}
     }
   }
+  function trackDedicated(event, params, eventId) {
+    if (typeof window.fbq === "function") {
+      try {
+        var opts = eventId ? { eventID: eventId } : {};
+        window.fbq("trackSingle", DEDICATED_PIXEL_ID, event, params || {}, opts);
+      } catch (_) {}
+    }
+  }
+  (function fireViewContent() {
+    trackDedicated("ViewContent", { content_name: SERVICE_NAME });
+  })();
 
   // ------- Back buttons -------
   document.querySelectorAll(".back-btn").forEach((btn) => {
@@ -281,8 +297,8 @@
         lastName: lastName || '-',
         email,
         phone,
-        source: 'Botox Glow Deal LP',
-        tags: ['Botox Glow Deal'],
+        source: 'Korean Facial LP',
+        tags: ['Korean Facial'],
       });
       const contactId = contactRes.contact?.id || contactRes.id;
 
@@ -295,13 +311,14 @@
         assignedUserId: GHL.userId,
         startTime:      isoInTz(start, BUSINESS_TZ),
         endTime:        isoInTz(end,   BUSINESS_TZ),
-        title:          `${name} — Botox Glow Deal`,
+        title:          `${name} — Korean Facial`,
         selectedTimezone: BUSINESS_TZ,
         appointmentStatus: 'new',
       });
 
       track("Lead", { content_name: SERVICE_NAME });
       track("Schedule", { content_name: SERVICE_NAME });
+      trackDedicated("Schedule", { content_name: SERVICE_NAME });
 
       renderConfirmation({
         service: SERVICE_NAME,
